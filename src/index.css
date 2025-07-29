@@ -2,41 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Black Swan Fintech Design System - Elite Finance Grade */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    /* Black Swan Core Colors - Psychologically optimized for elite finance */
+    --background: 0 0% 7%;                    /* Jet black #111111 - seriousness, focus */
+    --foreground: 0 0% 88%;                   /* Soft gray #E0E0E0 - readability, balance */
+    
+    --card: 215 70% 15%;                      /* Deep navy #0B1F3A - stability, authority */
+    --card-foreground: 0 0% 88%;              /* Soft gray for card text */
+    
+    --popover: 215 70% 15%;
+    --popover-foreground: 0 0% 88%;
+    
+    --primary: 215 70% 15%;                   /* Deep navy primary */
+    --primary-foreground: 48 74% 52%;         /* Gold #D4AF37 - prestige, wealth */
+    
+    --secondary: 215 60% 20%;                 /* Lighter navy variant */
+    --secondary-foreground: 0 0% 88%;
+    
+    --muted: 215 50% 12%;                     /* Darker navy for muted elements */
+    --muted-foreground: 0 0% 65%;             /* Muted gray text */
+    
+    --accent: 48 74% 52%;                     /* Gold accent */
+    --accent-foreground: 215 70% 15%;         /* Navy text on gold */
+    
+    --destructive: 0 84% 60%;                 /* Red for warnings */
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 215 50% 25%;                    /* Navy borders */
+    --input: 215 50% 18%;                     /* Input backgrounds */
+    --ring: 48 74% 52%;                       /* Gold focus rings */
+    
+    /* Black Swan Custom Variables */
+    --gold: 48 74% 52%;                       /* Primary gold accent */
+    --gold-muted: 48 60% 40%;                 /* Darker gold variant */
+    --navy-light: 215 60% 25%;                /* Lighter navy */
+    --navy-dark: 215 80% 8%;                  /* Darker navy */
+    --surface: 215 60% 18%;                   /* Surface elements */
+    --surface-elevated: 215 50% 22%;          /* Elevated surfaces */
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(215 70% 15%), hsl(215 80% 8%));
+    --gradient-gold: linear-gradient(135deg, hsl(48 74% 52%), hsl(48 60% 40%));
+    --gradient-glass: linear-gradient(135deg, 
+      hsla(215, 60%, 25%, 0.1), 
+      hsla(215, 50%, 18%, 0.05));
+    
+    /* Shadows for glassmorphism */
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    --shadow-elevation: 0 4px 16px 0 rgba(0, 0, 0, 0.4);
+    --shadow-gold: 0 4px 20px 0 rgba(212, 175, 55, 0.3);
+    
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +119,43 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Glassmorphism utility classes */
+  .glass {
+    background: var(--gradient-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-elevated {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: var(--shadow-elevation);
+  }
+
+  /* Custom scrollbar for elite feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--accent));
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--gold-muted));
   }
 }
