@@ -14,7 +14,335 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      borrowers: {
+        Row: {
+          address: string | null
+          annual_income: number | null
+          created_at: string
+          credit_score: number | null
+          date_of_birth: string | null
+          email: string
+          employment_status: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          annual_income?: number | null
+          created_at?: string
+          credit_score?: number | null
+          date_of_birth?: string | null
+          email: string
+          employment_status?: string | null
+          full_name: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          annual_income?: number | null
+          created_at?: string
+          credit_score?: number | null
+          date_of_birth?: string | null
+          email?: string
+          employment_status?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      loans: {
+        Row: {
+          borrower_id: string
+          created_at: string
+          disbursed_at: string | null
+          due_date: string
+          id: string
+          interest_rate: number
+          loan_amount: number
+          monthly_payment: number
+          status: Database["public"]["Enums"]["loan_status"]
+          term_months: number
+          updated_at: string
+        }
+        Insert: {
+          borrower_id: string
+          created_at?: string
+          disbursed_at?: string | null
+          due_date: string
+          id?: string
+          interest_rate: number
+          loan_amount: number
+          monthly_payment: number
+          status?: Database["public"]["Enums"]["loan_status"]
+          term_months: number
+          updated_at?: string
+        }
+        Update: {
+          borrower_id?: string
+          created_at?: string
+          disbursed_at?: string | null
+          due_date?: string
+          id?: string
+          interest_rate?: number
+          loan_amount?: number
+          monthly_payment?: number
+          status?: Database["public"]["Enums"]["loan_status"]
+          term_months?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loans_borrower_id_fkey"
+            columns: ["borrower_id"]
+            isOneToOne: false
+            referencedRelation: "borrowers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          role: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reminders: {
+        Row: {
+          blockchain_tx_hash: string | null
+          borrower_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          loan_id: string | null
+          message: string
+          method: Database["public"]["Enums"]["reminder_method"]
+          response_received: boolean | null
+          scheduled_at: string
+          sent_at: string | null
+          status: Database["public"]["Enums"]["reminder_status"]
+          updated_at: string
+        }
+        Insert: {
+          blockchain_tx_hash?: string | null
+          borrower_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          loan_id?: string | null
+          message: string
+          method: Database["public"]["Enums"]["reminder_method"]
+          response_received?: boolean | null
+          scheduled_at: string
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["reminder_status"]
+          updated_at?: string
+        }
+        Update: {
+          blockchain_tx_hash?: string | null
+          borrower_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          loan_id?: string | null
+          message?: string
+          method?: Database["public"]["Enums"]["reminder_method"]
+          response_received?: boolean | null
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["reminder_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_borrower_id_fkey"
+            columns: ["borrower_id"]
+            isOneToOne: false
+            referencedRelation: "borrowers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reminders_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "reminders_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_assessments: {
+        Row: {
+          assessment_date: string
+          borrower_id: string
+          created_at: string
+          created_by: string | null
+          factors: Json | null
+          id: string
+          loan_id: string | null
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          risk_score: number
+        }
+        Insert: {
+          assessment_date?: string
+          borrower_id: string
+          created_at?: string
+          created_by?: string | null
+          factors?: Json | null
+          id?: string
+          loan_id?: string | null
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          risk_score: number
+        }
+        Update: {
+          assessment_date?: string
+          borrower_id?: string
+          created_at?: string
+          created_by?: string | null
+          factors?: Json | null
+          id?: string
+          loan_id?: string | null
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          risk_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_assessments_borrower_id_fkey"
+            columns: ["borrower_id"]
+            isOneToOne: false
+            referencedRelation: "borrowers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_settings: {
+        Row: {
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      workflow_templates: {
+        Row: {
+          actions: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          trigger_conditions: Json
+          updated_at: string
+        }
+        Insert: {
+          actions: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          trigger_conditions: Json
+          updated_at?: string
+        }
+        Update: {
+          actions?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          trigger_conditions?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +351,10 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      loan_status: "active" | "paid" | "overdue" | "defaulted"
+      reminder_method: "sms" | "voice" | "whatsapp" | "email"
+      reminder_status: "pending" | "sent" | "delivered" | "failed" | "responded"
+      risk_level: "low" | "medium" | "high" | "critical"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +481,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      loan_status: ["active", "paid", "overdue", "defaulted"],
+      reminder_method: ["sms", "voice", "whatsapp", "email"],
+      reminder_status: ["pending", "sent", "delivered", "failed", "responded"],
+      risk_level: ["low", "medium", "high", "critical"],
+    },
   },
 } as const

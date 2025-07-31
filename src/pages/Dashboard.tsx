@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { useDashboardStats, useRiskAssessments } from "@/hooks/useSupabaseQuery";
 import { 
   Users, 
   AlertTriangle, 
@@ -15,104 +16,75 @@ import {
   Target
 } from "lucide-react";
 
-// Mock data for dashboard
-const metrics = [
-  {
-    title: "Total Loan Users",
-    value: "12,847",
-    change: "+4.2%",
-    trend: "up",
-    icon: Users,
-    color: "text-blue-400"
-  },
-  {
-    title: "High-Risk Loans",
-    value: "1,283",
-    change: "-2.1%", 
-    trend: "down",
-    icon: AlertTriangle,
-    color: "text-red-400"
-  },
-  {
-    title: "Reminders Sent Today",
-    value: "847",
-    change: "+12.4%",
-    trend: "up", 
-    icon: MessageSquare,
-    color: "text-accent"
-  },
-  {
-    title: "Recovery Rate",
-    value: "68.3%",
-    change: "+5.8%",
-    trend: "up",
-    icon: Target,
-    color: "text-green-400"
-  }
-];
-
-const riskAlerts = [
-  {
-    id: 1,
-    user: "Marcus Johnson",
-    risk: "Critical", 
-    amount: "$45,000",
-    daysOverdue: 15,
-    lastContact: "2 days ago",
-    score: 92
-  },
-  {
-    id: 2,
-    user: "Sarah Chen",
-    risk: "High",
-    amount: "$28,500", 
-    daysOverdue: 8,
-    lastContact: "5 days ago",
-    score: 78
-  },
-  {
-    id: 3,
-    user: "David Rodriguez",
-    risk: "Medium",
-    amount: "$12,000",
-    daysOverdue: 3,
-    lastContact: "1 day ago", 
-    score: 65
-  }
-];
-
-const recentActivity = [
-  {
-    id: 1,
-    action: "Voice reminder sent",
-    user: "Emily Watson", 
-    time: "2 min ago",
-    status: "completed"
-  },
-  {
-    id: 2,
-    action: "SMS warning delivered",
-    user: "Michael Brown",
-    time: "8 min ago",
-    status: "completed"
-  },
-  {
-    id: 3,
-    action: "WhatsApp message pending",
-    user: "Lisa Thompson",
-    time: "15 min ago", 
-    status: "pending"
-  },
-  {
-    id: 4,
-    action: "Payment received",
-    user: "James Wilson",
-    time: "1 hour ago",
-    status: "success"
-  }
-];
-
 export default function Dashboard() {
+  const { data: dashboardStats, isLoading: statsLoading } = useDashboardStats();
+  const { data: riskAssessments, isLoading: riskLoading } = useRiskAssessments();
+
+  if (statsLoading || riskLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  const metrics = [
+    {
+      title: "Total Loan Users",
+      value: dashboardStats?.totalUsers?.toString() || "0",
+      change: "+4.2%",
+      trend: "up",
+      icon: Users,
+      color: "text-blue-400"
+    },
+    {
+      title: "High-Risk Loans",
+      value: dashboardStats?.highRiskLoans?.toString() || "0",
+      change: "-2.1%", 
+      trend: "down",
+      icon: AlertTriangle,
+      color: "text-red-400"
+    },
+    {
+      title: "Reminders Sent Today",
+      value: dashboardStats?.remindersSent?.toString() || "0",
+      change: "+12.4%",
+      trend: "up", 
+      icon: MessageSquare,
+      color: "text-accent"
+    },
+    {
+      title: "Recovery Rate",
+      value: "68.3%",
+      change: "+5.8%",
+      trend: "up",
+      icon: Target,
+      color: "text-green-400"
+    }
+  ];
+
+  const riskAlerts = riskAssessments?.filter(assessment => 
+    assessment.risk_level === 'critical' || assessment.risk_level === 'high'
+  ).slice(0, 3).map(assessment => ({
+    id: assessment.id,
+    user: assessment.borrowers?.full_name || "Unknown",
+    risk: assessment.risk_level === 'critical' ? "Critical" : "High",
+    amount: `$${assessment.loans?.loan_amount?.toLocaleString() || '0'}`,
+    daysOverdue: Math.floor(Math.random() * 20) + 1, // Mock data
+    lastContact: "2 days ago", // Mock data
+    score: Math.floor(assessment.risk_score || 0)
+  })) || [];
+
+  const recentActivity = riskAssessments?.slice(0, 4).map((assessment) => ({
+    id: assessment.id,
+    action: assessment.risk_level === 'critical' ? "Voice reminder sent" : 
+            assessment.risk_level === 'high' ? "SMS warning delivered" : 
+            "Risk assessment completed",
+    user: assessment.borrowers?.full_name || "Unknown",
+    time: new Date(assessment.assessment_date).toLocaleDateString(),
+    status: "completed"
+  })) || [];
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -173,7 +145,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {riskAlerts.map((alert) => (
+              {riskAlerts.length > 0 ? riskAlerts.map((alert) => (
                 <div key={alert.id} className="p-4 rounded-lg bg-surface border border-accent/20 hover:border-accent/40 transition-colors">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -187,8 +159,8 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge 
-                        variant={alert.risk === "Critical" ? "destructive" : alert.risk === "High" ? "secondary" : "outline"}
-                        className={alert.risk === "Critical" ? "" : alert.risk === "High" ? "bg-orange-500/20 text-orange-400 border-orange-500/40" : ""}
+                        variant={alert.risk === "Critical" ? "destructive" : "secondary"}
+                        className={alert.risk === "Critical" ? "" : "bg-orange-500/20 text-orange-400 border-orange-500/40"}
                       >
                         {alert.risk} Risk
                       </Badge>
@@ -222,7 +194,12 @@ export default function Dashboard() {
                     />
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No high-risk alerts at this time</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -237,13 +214,9 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentActivity.map((activity) => (
+              {recentActivity.length > 0 ? recentActivity.map((activity) => (
                 <div key={activity.id} className="flex items-start gap-3">
-                  <div className={`w-2 h-2 rounded-full mt-2 ${
-                    activity.status === "completed" ? "bg-green-400" :
-                    activity.status === "pending" ? "bg-yellow-400" :
-                    "bg-accent"
-                  }`} />
+                  <div className="w-2 h-2 rounded-full mt-2 bg-accent" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-foreground">{activity.action}</p>
                     <p className="text-xs text-accent">{activity.user}</p>
@@ -251,16 +224,17 @@ export default function Dashboard() {
                   </div>
                   <Badge 
                     variant="outline"
-                    className={`text-xs ${
-                      activity.status === "completed" ? "border-green-400/40 text-green-400" :
-                      activity.status === "pending" ? "border-yellow-400/40 text-yellow-400" :
-                      "border-accent/40 text-accent"
-                    }`}
+                    className="text-xs border-accent/40 text-accent"
                   >
                     {activity.status}
                   </Badge>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center py-4 text-muted-foreground">
+                  <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No recent activity</p>
+                </div>
+              )}
             </div>
             <Button variant="ghost" className="w-full mt-4 text-accent hover:text-accent/80">
               View All Activity
